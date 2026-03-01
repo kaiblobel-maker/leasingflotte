@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Flotte">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180x180.png">
+<title>Flotte · Blobel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
+:root {
+  --st: env(safe-area-inset-top,0px);
+  --sb: env(safe-area-inset-bottom,0px);
+  --sl: env(safe-area-inset-left,0px);
+  --sr: env(safe-area-inset-right,0px);
+
+  --bg:       #0a0a0a;
+  --bg1:      #111111;
+  --bg2:      #1a1a1a;
+  --bg3:      #222222;
+  --bg4:      #2a2a2a;
+  --line:     rgba(255,255,255,.06);
+  --line2:    rgba(255,255,255,.11);
+  --line3:    rgba(255,255,255,.18);
+  --text:     #f0f0f0;
+  --text2:    #a0a0a0;
+  --text3:    #606060;
+  --gold:     #c9a84c;
+  --gold2:    #e8c96e;
+  --gold3:    rgba(201,168,76,.15);
+  --green:    #30d158;
+  --green2:   rgba(48,209,88,.12);
+  --red:      #ff453a;
+  --red2:     rgba(255,69,58,.12);
+  --amber:    #ff9f0a;
+  --amber2:   rgba(255,159,10,.12);
+  --blue:     #0a84ff;
+  --blue2:    rgba(10,132,255,.12);
+
+  --r:        16px;
+  --r-sm:     10px;
+  --r-lg:     22px;
+  --r-xl:     28px;
+
+  --blur: saturate(200%) blur(24px);
+}
+
+/* ═══════════════════════════════════════
+   BASE
+═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--text);
+  display:flex;flex-direction:column;
+  overscroll-behavior:none;
+}
+input,select,textarea,button{font-family:inherit;}
+
+/* ═══════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════ */
+.topbar{
+  flex-shrink:0;
+  background:rgba(10,10,10,.85);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-bottom:1px solid var(--line);
+  padding:calc(var(--st) + 12px) 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:50;
+}
+.tb-left{display:flex;align-items:center;gap:12px;}
+.tb-logo{
+  width:38px;height:38px;border-radius:11px;
+  background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;flex-shrink:0;
+}
+.tb-name{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;letter-spacing:-.3px;}
+.tb-sub{font-size:11px;color:var(--text3);font-weight:500;margin-top:1px;letter-spacing:.3px;}
+.tb-btn{
+  background:var(--bg3);
+  border:1px solid var(--line2);
+  color:var(--gold);border-radius:9px;
+  padding:8px 16px;font-size:14px;font-weight:600;
+  cursor:pointer;display:none;transition:all .15s;
+  letter-spacing:-.1px;
+}
+.tb-btn:active{opacity:.7;transform:scale(.96);}
+
+/* ═══════════════════════════════════════
+   SCROLL
+═══════════════════════════════════════ */
+.scroll{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(82px + var(--sb));
+}
+
+/* ═══════════════════════════════════════
+   TABBAR
+═══════════════════════════════════════ */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(10,10,10,.92);
+  backdrop-filter:var(--blur);
+  -webkit-backdrop-filter:var(--blur);
+  border-top:1px solid var(--line);
+  display:flex;
+  padding:8px calc(var(--sl)) calc(var(--sb) + 8px);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  border:none;background:none;cursor:pointer;
+  padding:4px 6px;transition:transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab:active{transform:scale(.88);}
+.ti{
+  width:46px;height:32px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;transition:background .2s;position:relative;
+}
+.tab.active .ti{background:rgba(201,168,76,.15);}
+.tl{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.3px;}
+.tab.active .tl{color:var(--gold);}
+.tbadge{
+  position:absolute;top:-3px;right:1px;
+  background:var(--red);color:#fff;
+  font-size:9px;font-weight:800;
+  min-width:16px;height:16px;border-radius:8px;
+  display:none;align-items:center;justify-content:center;
+  padding:0 4px;border:2px solid var(--bg);
+}
+.tbadge.on{display:flex;}
+
+/* ═══════════════════════════════════════
+   PAGES
+═══════════════════════════════════════ */
+.page{display:none;}
+.page.active{display:block;animation:pgIn .22s ease;}
+@keyframes pgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ═══════════════════════════════════════
+   DASHBOARD HERO
+═══════════════════════════════════════ */
+.d-hero{
+  padding:20px 16px 0;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:12px;
+}
+.d-hero-greeting{
+  font-family:'Syne',sans-serif;
+  font-size:28px;font-weight:800;
+  letter-spacing:-.5px;line-height:1.1;
+}
+.d-hero-greeting span{color:var(--gold);}
+.d-hero-date{font-size:12px;color:var(--text3);margin-top:4px;}
+
+/* KPI ROW */
+.kpi-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;padding:16px 16px 0;
+}
+.kpi{
+  background:var(--bg2);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:16px 14px;
+  position:relative;overflow:hidden;
+}
+.kpi::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+}
+.kpi-gold::after{background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.kpi-green::after{background:var(--green);}
+.kpi-red::after{background:var(--red);}
+.kpi-val{
+  font-family:'Syne',sans-serif;
+  font-size:28px;font-weight:800;
+  letter-spacing:-1px;line-height:1;
+}
+.kpi-gold .kpi-val{color:var(--gold2);}
+.kpi-green .kpi-val{color:var(--green);}
+.kpi-red .kpi-val{color:var(--red);}
+.kpi-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-top:5px;}
+
+/* ALERT */
+.d-alert{
+  margin:14px 16px 0;
+  background:rgba(255,69,58,.08);
+  border:1px solid rgba(255,69,58,.2);
+  border-radius:var(--r);padding:14px 16px;
+  display:none;align-items:center;gap:10px;
+}
+.d-alert.show{display:flex;}
+.d-alert-ico{font-size:18px;flex-shrink:0;}
+.d-alert-txt{font-size:13px;line-height:1.45;color:var(--text2);}
+.d-alert-txt b{color:var(--red);}
+
+/* SECTION */
+.sec{padding:0 16px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:22px 0 12px;}
+.sec-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.2px;}
+.sec-more{font-size:13px;font-weight:600;color:var(--gold);cursor:pointer;opacity:.8;}
+
+/* ═══════════════════════════════════════
+   VEHICLE CARD
+═══════════════════════════════════════ */
+.vcard{
+  background:var(--bg1);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  margin-bottom:12px;
+  overflow:hidden;
+  transition:border-color .2s;
+  position:relative;
+}
+.vcard:active{border-color:var(--line3);}
+
+/* PHOTO AREA */
+.vcard-photo{
+  width:100%;height:180px;
+  background:var(--bg2);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.vcard-photo img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;
+}
+.vcard-photo-placeholder{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:var(--text3);cursor:pointer;
+}
+.vcard-photo-placeholder span{font-size:36px;}
+.vcard-photo-placeholder p{font-size:12px;font-weight:500;}
+.vcard-photo-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent, rgba(0,0,0,.7));
+  padding:20px 16px 14px;
+}
+.vcard-photo-input{
+  position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;
+}
+
+/* STATUS BAR */
+.vcard-status-bar{
+  position:absolute;top:12px;left:12px;
+  display:flex;gap:6px;z-index:3;
+}
+
+/* CARD BODY */
+.vcard-body{padding:16px;}
+.vcard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+.vcard-name{
+  font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:700;letter-spacing:-.3px;
+}
+.vcard-kz{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--text3);margin-top:3px;font-weight:500;
+  background:var(--bg3);padding:3px 8px;border-radius:6px;display:inline-block;
+}
+
+/* STATS ROW */
+.vcard-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--line);border-radius:12px;overflow:hidden;
+  margin-bottom:14px;
+}
+.vstat{
+  background:var(--bg2);padding:12px 10px;text-align:center;
+}
+.vstat-val{
+  font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px;
+}
+.vstat-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+
+/* DETAIL ROWS */
+.vcard-rows{border-top:1px solid var(--line);padding-top:10px;margin-bottom:12px;}
+.vrow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;}
+.vrow+.vrow{border-top:1px solid var(--line);}
+.vrow-lbl{font-size:12px;color:var(--text3);font-weight:500;}
+.vrow-val{font-size:13px;font-weight:600;color:var(--text2);text-align:right;max-width:55%;}
+.vrow-val.mono{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:12px;}
+
+/* ACTION BUTTONS */
+.vcard-actions{display:flex;gap:8px;}
+.va-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  background:var(--bg3);border:1px solid var(--line2);
+  border-radius:10px;padding:10px 12px;
+  font-size:13px;font-weight:600;color:var(--text2);
+  cursor:pointer;transition:all .12s;
+}
+.va-btn:active{background:var(--bg4);transform:scale(.97);}
+.va-btn-del{color:var(--red);border-color:rgba(255,69,58,.2);background:var(--red2);}
+
+/* ═══════════════════════════════════════
+   STATUS CHIPS
+═══════════════════════════════════════ */
+.chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 10px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:.3px;
+  backdrop-filter:blur(8px);
+}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+.ch-aktiv   {background:rgba(48,209,88,.15);color:var(--green);}
+.ch-aktiv .dot{background:var(--green);}
+.ch-bestellt{background:rgba(201,168,76,.15);color:var(--gold2);}
+.ch-bestellt .dot{background:var(--gold);animation:blink 1.2s infinite;}
+.ch-endet   {background:rgba(255,159,10,.15);color:var(--amber);}
+.ch-endet .dot{background:var(--amber);}
+.ch-verkauft{background:rgba(255,255,255,.06);color:var(--text3);}
+.ch-verkauft .dot{background:var(--text3);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.rl{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.rl-ok  {background:var(--green2);color:var(--green);}
+.rl-warn{background:var(--amber2);color:var(--amber);}
+.rl-hot {background:var(--red2);color:var(--red);animation:hotpulse 1s infinite;}
+.rl-na  {background:rgba(255,255,255,.05);color:var(--text3);}
+@keyframes hotpulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* ═══════════════════════════════════════
+   FILTER / SEARCH
+═══════════════════════════════════════ */
+.filters{padding:16px 16px 0;display:flex;flex-direction:column;gap:8px;}
+.fi-row{display:flex;gap:8px;}
+.fi-input{
+  flex:1;background:var(--bg2);border:1px solid var(--line2);
+  border-radius:var(--r-sm);padding:12px 14px;
+  font-size:15px;color:var(--text);-webkit-appearance:none;
+  transition:border-color .15s;
+}
+.fi-input::placeholder{color:var(--text3);}
+.fi-input:focus{outline:none;border-color:var(--gold);}
+.fi-sel{
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:var(--r-sm);padding:12px 10px;
+  font-size:13px;color:var(--text2);
+  -webkit-appearance:none;appearance:none;flex-shrink:0;
+  cursor:pointer;
+}
+.fi-sel:focus{outline:none;}
+
+/* ═══════════════════════════════════════
+   NOTE CARDS
+═══════════════════════════════════════ */
+.ncard{
+  background:var(--bg1);border:1px solid var(--line);
+  border-radius:var(--r);padding:16px;margin-bottom:10px;
+}
+.ncard-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.ncard-kz{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+  background:var(--gold3);color:var(--gold2);
+  padding:3px 8px;border-radius:6px;
+}
+.ncard-date{font-size:11px;color:var(--text3);}
+.ncard-thema{
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;
+  color:var(--blue);background:var(--blue2);padding:3px 7px;border-radius:5px;
+}
+.ncard-author{font-size:12px;color:var(--text3);margin-bottom:8px;}
+.ncard-body{font-size:14px;line-height:1.6;color:var(--text2);margin-bottom:8px;}
+.ncard-todo{
+  font-size:13px;line-height:1.45;
+  background:var(--gold3);border-left:3px solid var(--gold);
+  padding:8px 10px;border-radius:0 8px 8px 0;
+  margin-bottom:10px;color:var(--text2);
+}
+.ncard-todo b{color:var(--gold2);}
+.ncard-footer{display:flex;align-items:center;justify-content:space-between;}
+.erl{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.erl-ja {background:var(--green2);color:var(--green);}
+.erl-nein{background:var(--red2);color:var(--red);}
+.erl-ip {background:var(--amber2);color:var(--amber);}
+.nbts{display:flex;gap:6px;}
+.ibtn{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--line);
+  font-size:13px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .12s;
+}
+.ibtn:active{transform:scale(.88);}
+
+/* ═══════════════════════════════════════
+   EXPORT
+═══════════════════════════════════════ */
+.xsec{padding:20px 16px 0;}
+.xcard{
+  background:var(--bg1);border:1px solid var(--line);
+  border-radius:var(--r);padding:20px;margin-bottom:10px;
+}
+.xcard-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;}
+.xcard-desc{font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:16px;}
+.install-bar{
+  background:var(--blue2);border:1px solid rgba(10,132,255,.25);
+  border-radius:var(--r);padding:16px;margin-bottom:12px;display:none;
+}
+.install-bar.show{display:block;}
+.install-bar strong{color:var(--blue);font-size:14px;}
+.install-bar p{font-size:13px;color:var(--text2);margin-top:5px;line-height:1.5;}
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:14px 20px;border-radius:var(--r-sm);
+  font-size:15px;font-weight:700;
+  cursor:pointer;border:none;
+  transition:opacity .15s,transform .1s;width:100%;
+  letter-spacing:-.1px;
+}
+.btn:active{opacity:.8;transform:scale(.98);}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#0a0a0a;
+}
+.btn-outline{
+  background:transparent;color:var(--text);
+  border:1px solid var(--line2);
+}
+.btn-sm{padding:10px 14px;font-size:13px;border-radius:9px;width:auto;flex:1;}
+
+/* ═══════════════════════════════════════
+   MODAL SHEET
+═══════════════════════════════════════ */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  align-items:flex-end;
+}
+.overlay.open{display:flex;animation:oIn .18s ease;}
+@keyframes oIn{from{opacity:0;}to{opacity:1;}}
+.sheet{
+  background:var(--bg1);
+  border-radius:28px 28px 0 0;
+  border-top:1px solid var(--line2);
+  width:100%;max-height:93vh;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--sb) + 24px);
+  animation:sUp .26s cubic-bezier(.34,1.1,.64,1);
+}
+@keyframes sUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-grip{width:32px;height:4px;border-radius:2px;background:var(--bg4);margin:14px auto 0;}
+.sheet-hdr{padding:18px 22px 0;display:flex;align-items:center;justify-content:space-between;}
+.sheet-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;}
+.sheet-x{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--bg3);border:none;
+  font-size:14px;color:var(--text3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.sheet-body{padding:18px 22px;}
+
+/* FORM */
+.fg{margin-bottom:15px;}
+.fg-lbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px;}
+.fi,.fs,.ft{
+  width:100%;background:var(--bg2);
+  border:1px solid var(--line2);border-radius:var(--r-sm);
+  padding:13px 14px;font-size:16px;color:var(--text);
+  -webkit-appearance:none;appearance:none;
+  transition:border-color .15s;
+}
+.fi::placeholder,.ft::placeholder{color:var(--text3);}
+.fi:focus,.fs:focus,.ft:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.08);}
+.fs{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23606060' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px;
+}
+.ft{resize:vertical;min-height:88px;font-size:15px;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* PHOTO UPLOAD IN FORM */
+.photo-upload{
+  width:100%;height:140px;
+  background:var(--bg2);border:2px dashed var(--line2);
+  border-radius:var(--r);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:border-color .15s;
+}
+.photo-upload:active{border-color:var(--gold);}
+.photo-upload img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.photo-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;}
+.photo-upload span{font-size:28px;}
+.photo-upload p{font-size:13px;color:var(--text3);font-weight:500;}
+.photo-upload .photo-hint{font-size:11px;color:var(--text3);opacity:.6;}
+
+/* EMPTY */
+.empty{text-align:center;padding:64px 20px;color:var(--text3);}
+.empty-ico{font-size:48px;margin-bottom:10px;opacity:.3;}
+.empty-txt{font-size:14px;font-weight:500;}
+
+/* TOAST */
+.toasts{position:fixed;top:calc(var(--st) + 72px);left:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{
+  background:var(--bg3);color:var(--text);
+  border:1px solid var(--line2);
+  border-radius:12px;padding:13px 16px;
+  font-size:14px;font-weight:500;
+  display:flex;align-items:center;gap:8px;
+  animation:tIn .22s cubic-bezier(.34,1.2,.64,1);
+}
+@keyframes tIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.t-ok::before{content:'✓';color:var(--green);font-weight:900;font-size:15px;}
+.t-err::before{content:'!';color:var(--red);font-weight:900;font-size:15px;}
+
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="tb-left">
+    <div class="tb-logo">🚗</div>
+    <div>
+      <div class="tb-name">Flotte</div>
+      <div class="tb-sub">Kai Blobel · DVAG</div>
+    </div>
+  </div>
+  <button class="tb-btn" id="tb-btn" onclick="handleAction()"></button>
+</header>
+
+<!-- SCROLL -->
+<div class="scroll" id="scr">
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="d-hero">
+      <div>
+        <div class="d-hero-greeting" id="greeting">Guten <span>Morgen</span></div>
+        <div class="d-hero-date" id="herodate"></div>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi kpi-gold">
+        <div class="kpi-val" id="k-tot">—</div>
+        <div class="kpi-lbl">Fahrzeuge</div>
+      </div>
+      <div class="kpi kpi-green">
+        <div class="kpi-val" id="k-akt">—</div>
+        <div class="kpi-lbl">Aktiv</div>
+      </div>
+      <div class="kpi kpi-red">
+        <div class="kpi-val" id="k-tod">—</div>
+        <div class="kpi-lbl">To-Dos</div>
+      </div>
+    </div>
+
+    <div class="d-alert" id="d-alert">
+      <div class="d-alert-ico">⚠️</div>
+      <div class="d-alert-txt" id="d-alert-txt"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr">
+        <div class="sec-title">Fahrzeuge</div>
+        <div class="sec-more" onclick="goTab('fahrzeuge')">Alle →</div>
+      </div>
+      <div id="d-cards"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr">
+        <div class="sec-title">Offene Aufgaben</div>
+        <div class="sec-more" onclick="goTab('notizen')">Alle →</div>
+      </div>
+      <div id="d-todos"></div>
+    </div>
+  </div>
+
+  <!-- ═══ FAHRZEUGE ═══ -->
+  <div class="page" id="page-fahrzeuge">
+    <div class="filters">
+      <div class="fi-row">
+        <input class="fi-input" id="fq" placeholder="🔍  Suchen …" oninput="renderFz()">
+        <select class="fi-sel" id="ff" onchange="renderFz()">
+          <option value="">Alle</option>
+          <option>aktiv</option><option>bestellt</option>
+          <option>endet</option><option>verkauft</option>
+        </select>
+      </div>
+    </div>
+    <div class="sec"><div id="fz-list" style="padding-top:12px"></div></div>
+  </div>
+
+  <!-- ═══ NOTIZEN ═══ -->
+  <div class="page" id="page-notizen">
+    <div class="filters">
+      <div class="fi-row">
+        <input class="fi-input" id="nq" placeholder="🔍  Suchen …" oninput="renderNz()">
+        <select class="fi-sel" id="nkf" onchange="renderNz()"><option value="">Alle</option></select>
+      </div>
+      <div class="fi-row">
+        <select class="fi-sel" style="flex:1" id="nef" onchange="renderNz()">
+          <option value="">Alle Status</option>
+          <option value="Nein">Offen</option>
+          <option value="In Bearbeitung">In Bearb.</option>
+          <option value="Ja">Erledigt</option>
+        </select>
+      </div>
+    </div>
+    <div class="sec"><div id="nz-list" style="padding-top:12px"></div></div>
+  </div>
+
+  <!-- ═══ EXPORT ═══ -->
+  <div class="page" id="page-export">
+    <div class="xsec">
+      <div class="install-bar" id="install-bar">
+        <strong>📲 Als App installieren</strong>
+        <p>Safari → Teilen (↑) → <strong>„Zum Home-Bildschirm"</strong></p>
+      </div>
+      <div class="xcard">
+        <div class="xcard-title">📊 Fahrzeuge als CSV</div>
+        <div class="xcard-desc">Alle Stammdaten — direkt in Excel öffnen</div>
+        <button class="btn btn-gold" onclick="exportCSV('fz')">Exportieren</button>
+      </div>
+      <div class="xcard">
+        <div class="xcard-title">📋 Notizen als CSV</div>
+        <div class="xcard-desc">Alle Protokolle und To-Dos</div>
+        <button class="btn btn-gold" onclick="exportCSV('nz')">Exportieren</button>
+      </div>
+      <div class="xcard">
+        <div class="xcard-title">💾 Komplett-Backup (JSON)</div>
+        <div class="xcard-desc">Alle Daten sichern — inkl. Fotos</div>
+        <button class="btn btn-outline" onclick="exportJSON()">Backup erstellen</button>
+      </div>
+      <div class="xcard">
+        <div class="xcard-title">📥 Backup wiederherstellen</div>
+        <div class="xcard-desc">JSON importieren und Daten zurücksetzen</div>
+        <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
+        <button class="btn btn-outline" onclick="document.getElementById('imp').click()">Importieren</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /scroll -->
+
+<!-- TABBAR -->
+<nav class="tabbar">
+  <button class="tab active" id="tab-dashboard" onclick="goTab('dashboard')">
+    <div class="ti">◈</div>
+    <div class="tl">Übersicht</div>
+  </button>
+  <button class="tab" id="tab-fahrzeuge" onclick="goTab('fahrzeuge')">
+    <div class="ti">🚙</div>
+    <div class="tl">Fahrzeuge</div>
+  </button>
+  <button class="tab" id="tab-notizen" onclick="goTab('notizen')">
+    <div class="ti" style="position:relative">📋<span class="tbadge" id="tbadge"></span></div>
+    <div class="tl">Notizen</div>
+  </button>
+  <button class="tab" id="tab-export" onclick="goTab('export')">
+    <div class="ti">↑</div>
+    <div class="tl">Export</div>
+  </button>
+</nav>
+
+<div class="toasts" id="toasts"></div>
+
+<!-- MODAL: FAHRZEUG -->
+<div class="overlay" id="m-fz">
+  <div class="sheet">
+    <div class="sheet-grip"></div>
+    <div class="sheet-hdr">
+      <div class="sheet-title" id="mfz-t">Fahrzeug</div>
+      <button class="sheet-x" onclick="closeModal('m-fz')">✕</button>
+    </div>
+    <div class="sheet-body">
+
+      <!-- PHOTO UPLOAD -->
+      <div class="fg">
+        <label class="fg-lbl">Fahrzeugfoto</label>
+        <div class="photo-upload" id="photo-preview">
+          <input type="file" accept="image/*" id="photo-input" onchange="handlePhotoChange(event)">
+          <span>📷</span>
+          <p>Foto tippen zum Hochladen</p>
+          <div class="photo-hint">JPG, PNG — wird lokal gespeichert</div>
+        </div>
+      </div>
+
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">Fahrzeugtyp *</label><input class="fi" id="f-typ" placeholder="Audi A5"></div>
+        <div class="fg"><label class="fg-lbl">Kennzeichen *</label><input class="fi" id="f-kz" placeholder="CB-KB 87"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">Fahrer</label><input class="fi" id="f-fhr"></div>
+        <div class="fg"><label class="fg-lbl">Status</label>
+          <select class="fs" id="f-st"><option>aktiv</option><option>bestellt</option><option>endet</option><option>verkauft</option></select>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">Leasingbeginn</label><input class="fi" id="f-bg" type="date"></div>
+        <div class="fg"><label class="fg-lbl">Leasingende</label><input class="fi" id="f-en" type="date"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">KM Gesamt</label><input class="fi" id="f-kg" type="number" placeholder="30000"></div>
+        <div class="fg"><label class="fg-lbl">KM Aktuell</label><input class="fi" id="f-ka" type="number" placeholder="12500"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">Rate €/Mon.</label><input class="fi" id="f-rt" type="number" step="0.01"></div>
+        <div class="fg"><label class="fg-lbl">Vertragsnr.</label><input class="fi" id="f-vn"></div>
+      </div>
+      <div class="fg"><label class="fg-lbl">Leasinggesellschaft</label><input class="fi" id="f-lg"></div>
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">Kontonummer</label><input class="fi" id="f-kt"></div>
+        <div class="fg"><label class="fg-lbl">Letzter Kontakt</label><input class="fi" id="f-lk" type="date"></div>
+      </div>
+      <div class="fg"><label class="fg-lbl">Bemerkungen</label><textarea class="ft" id="f-bm"></textarea></div>
+      <button class="btn btn-gold" onclick="saveFz()" style="margin-bottom:10px">Speichern</button>
+      <button class="btn btn-outline" onclick="closeModal('m-fz')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOTIZ -->
+<div class="overlay" id="m-nz">
+  <div class="sheet">
+    <div class="sheet-grip"></div>
+    <div class="sheet-hdr">
+      <div class="sheet-title" id="mnz-t">Notiz</div>
+      <button class="sheet-x" onclick="closeModal('m-nz')">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">Datum *</label><input class="fi" id="n-dt" type="date"></div>
+        <div class="fg"><label class="fg-lbl">Fahrzeug</label><select class="fs" id="n-kz"><option value="">—</option></select></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label class="fg-lbl">Ansprechpartner</label><input class="fi" id="n-ap"></div>
+        <div class="fg"><label class="fg-lbl">Thema</label>
+          <select class="fs" id="n-th">
+            <option>Leasing</option><option>Schaden</option><option>Wartung</option>
+            <option>Versicherung</option><option>Rückgabe</option>
+            <option>Vertragsverlängerung</option><option>Sonstiges</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label class="fg-lbl">Gesprächsnotiz</label><textarea class="ft" id="n-ih" style="min-height:100px"></textarea></div>
+      <div class="fg"><label class="fg-lbl">To-Do / Nächster Schritt</label><input class="fi" id="n-td"></div>
+      <div class="fg"><label class="fg-lbl">Erledigt</label>
+        <select class="fs" id="n-er"><option>Nein</option><option>In Bearbeitung</option><option>Ja</option></select>
+      </div>
+      <button class="btn btn-gold" onclick="saveNz()" style="margin-bottom:10px">Speichern</button>
+      <button class="btn btn-outline" onclick="closeModal('m-nz')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────
+const KF='fl3_fz', KN='fl3_nz';
+const ld=k=>{try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}};
+const sv=(k,d)=>localStorage.setItem(k,JSON.stringify(d));
+let FZ=ld(KF), NZ=ld(KN);
+let eFz=null, eNz=null, curTab='dashboard', tmpPhoto=null;
+
+if(!FZ.length){
+  FZ=[
+    {id:uid(),typ:'Audi A5 Quattro',     kz:'CBE-KB 83', fhr:'Kai Blobel', st:'aktiv',   bg:'',en:'',kg:'',ka:'',rt:'',vn:'',       lg:'',kt:'',lk:'',bm:'',photo:''},
+    {id:uid(),typ:'VW California Beach',  kz:'CB (offen)',fhr:'Kai Blobel', st:'bestellt',bg:'',en:'',kg:'',ka:'',rt:'',vn:'',       lg:'',kt:'',lk:'',bm:'',photo:''},
+    {id:uid(),typ:'VW Passat',            kz:'CB-AB 82',  fhr:'Kühn',       st:'aktiv',   bg:'',en:'',kg:'',ka:'',rt:'',vn:'R2607072',lg:'',kt:'',lk:'',bm:'',photo:''},
+    {id:uid(),typ:'VW Passat',            kz:'CB-KB 87',  fhr:'Kai Blobel', st:'aktiv',   bg:'',en:'',kg:'',ka:'',rt:'',vn:'M279105', lg:'',kt:'',lk:'',bm:'',photo:''},
+    {id:uid(),typ:'VW Tiguan',            kz:'CB-UB 55',  fhr:'Uwe Blobel', st:'aktiv',   bg:'',en:'',kg:'',ka:'',rt:'',vn:'',       lg:'',kt:'',lk:'',bm:'',photo:''},
+  ];
+  sv(KF,FZ);
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+// ── HELPERS ───────────────────────────────
+const rl=e=>e?Math.floor((new Date(e)-new Date())/(86400000*30.44)):null;
+const fD=d=>d?d.split('-').reverse().join('.'):'—';
+const fE=v=>v?new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(v):'—';
+const fKM=v=>v?parseInt(v).toLocaleString('de-DE')+' km':'—';
+const today=()=>new Date().toISOString().slice(0,10);
+
+function rlTag(mo){
+  if(mo===null)return'<span class="rl rl-na">k. A.</span>';
+  if(mo<0)return'<span class="rl rl-hot">abgelaufen</span>';
+  if(mo<3)return`<span class="rl rl-hot">${mo} Mon.</span>`;
+  if(mo<6)return`<span class="rl rl-warn">${mo} Mon.</span>`;
+  return`<span class="rl rl-ok">${mo} Mon.</span>`;
+}
+function chip(s){return`<span class="chip ch-${s}"><span class="dot"></span>${s}</span>`;}
+function erlChip(e){const m={'Ja':'erl-ja','Nein':'erl-nein','In Bearbeitung':'erl-ip'};return`<span class="erl ${m[e]||'erl-nein'}">${e||'Nein'}</span>`;}
+
+function photoToDataUrl(file){
+  return new Promise(res=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      // Compress to max 600px wide
+      const img=new Image();
+      img.onload=()=>{
+        const maxW=600,scale=Math.min(1,maxW/img.width);
+        const c=document.createElement('canvas');
+        c.width=img.width*scale;c.height=img.height*scale;
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg',.75));
+      };
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+// ── NAV ───────────────────────────────────
+function goTab(t){
+  curTab=t;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+t).classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('scr').scrollTop=0;
+  const btn=document.getElementById('tb-btn');
+  btn.style.display='none';
+  if(t==='fahrzeuge'){btn.style.display='';btn.textContent='+ Neu';}
+  if(t==='notizen'){btn.style.display='';btn.textContent='+ Notiz';fillKzDD();}
+  if(t==='dashboard')renderDash();
+  if(t==='fahrzeuge')renderFz();
+  if(t==='notizen')renderNz();
+  if(t==='export')checkInstall();
+}
+function handleAction(){
+  if(curTab==='fahrzeuge')openFzM();
+  if(curTab==='notizen')openNzM();
+}
+
+// ── DASHBOARD ─────────────────────────────
+function renderDash(){
+  FZ=ld(KF);NZ=ld(KN);
+  const h=new Date().getHours();
+  const gw=h<12?'Morgen':h<18?'Tag':'Abend';
+  document.getElementById('greeting').innerHTML=`Guten <span>${gw}</span>`;
+  document.getElementById('herodate').textContent=new Date().toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('k-tot').textContent=FZ.length;
+  document.getElementById('k-akt').textContent=FZ.filter(f=>f.st==='aktiv').length;
+  const todos=NZ.filter(n=>n.er==='Nein').length;
+  document.getElementById('k-tod').textContent=todos;
+
+  // alert
+  const urg=FZ.filter(f=>{const r=rl(f.en);return r!==null&&r>=0&&r<=3;});
+  const al=document.getElementById('d-alert');
+  if(urg.length){
+    al.classList.add('show');
+    document.getElementById('d-alert-txt').innerHTML=`<b>${urg.length} Fahrzeug${urg.length>1?'e':''}</b> läuft in &lt; 3 Monaten aus: ${urg.map(f=>f.kz).join(', ')}`;
+  }else al.classList.remove('show');
+
+  // vehicle cards (compact for dashboard)
+  document.getElementById('d-cards').innerHTML=FZ.map(f=>`
+    <div class="vcard" onclick="goTab('fahrzeuge')" style="cursor:pointer">
+      ${f.photo?`
+        <div class="vcard-photo">
+          <img src="${f.photo}" alt="${f.typ}">
+          <div class="vcard-status-bar">${chip(f.st)}${rlTag(rl(f.en))}</div>
+          <div class="vcard-photo-overlay">
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff">${f.typ}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">${f.kz}</div>
+          </div>
+        </div>`:`
+        <div class="vcard-body" style="padding-bottom:0">
+          <div class="vcard-top">
+            <div><div class="vcard-name">${f.typ}</div><div class="vcard-kz">${f.kz}</div></div>
+            ${chip(f.st)}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${rlTag(rl(f.en))}</div>
+        </div>`}
+      <div class="vcard-body" style="${f.photo?'':'padding-top:0'}">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:12px;color:var(--text3)">${f.fhr?'👤 '+f.fhr:''}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold2)">${f.rt?fE(f.rt)+'/Mo.':''}</div>
+        </div>
+      </div>
+    </div>`).join('')
+  ||'<div class="empty"><div class="empty-ico">🚗</div><div class="empty-txt">Noch keine Fahrzeuge</div></div>';
+
+  // open todos
+  document.getElementById('d-todos').innerHTML=NZ.filter(n=>n.er==='Nein').slice(0,3).map(n=>`
+    <div class="ncard" onclick="goTab('notizen')">
+      <div class="ncard-top">
+        <span class="ncard-kz">${n.kz||'—'}</span>
+        <span class="ncard-date">${fD(n.dt)}</span>
+        ${n.th?`<span class="ncard-thema">${n.th}</span>`:''}
+      </div>
+      ${n.td?`<div class="ncard-todo"><b>📌 To-Do:</b> ${n.td}</div>`:''}
+      <div class="ncard-footer">${erlChip(n.er)}</div>
+    </div>`).join('')
+  ||(NZ.length?'<div class="empty"><div class="empty-ico">✅</div><div class="empty-txt">Keine offenen To-Dos</div></div>':'<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">Noch keine Notizen</div></div>');
+
+  updateBadge();
+}
+
+function updateBadge(){
+  const c=ld(KN).filter(n=>n.er==='Nein').length;
+  const b=document.getElementById('tbadge');
+  b.textContent=c;b.classList.toggle('on',c>0);
+}
+
+// ── FAHRZEUGE ─────────────────────────────
+function renderFz(){
+  FZ=ld(KF);
+  const q=(document.getElementById('fq')?.value||'').toLowerCase();
+  const sf=document.getElementById('ff')?.value||'';
+  const list=FZ.filter(f=>(!q||[f.typ,f.kz,f.fhr,f.vn,f.lg].join(' ').toLowerCase().includes(q))&&(!sf||f.st===sf));
+  const el=document.getElementById('fz-list');
+  el.innerHTML=list.map(f=>`
+    <div class="vcard">
+      <!-- PHOTO -->
+      ${f.photo?`
+        <div class="vcard-photo">
+          <img src="${f.photo}" alt="${f.typ}">
+          <div class="vcard-status-bar">${chip(f.st)}${rlTag(rl(f.en))}</div>
+          <div class="vcard-photo-overlay">
+            <div style="font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:#fff">${f.typ}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,255,255,.6);margin-top:3px">${f.kz}${f.vn?' · '+f.vn:''}</div>
+          </div>
+        </div>`:`
+        <div class="vcard-body" style="padding-bottom:8px">
+          <div class="vcard-top">
+            <div><div class="vcard-name">${f.typ}</div><div class="vcard-kz">${f.kz}${f.vn?' · '+f.vn:''}</div></div>
+            ${chip(f.st)}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">${rlTag(rl(f.en))}</div>
+        </div>`}
+
+      <!-- STATS -->
+      <div class="vcard-body" style="${f.photo?'':'padding-top:8px'}">
+        <div class="vcard-stats">
+          <div class="vstat">
+            <div class="vstat-val">${f.rt?fE(f.rt):'—'}</div>
+            <div class="vstat-lbl">Rate/Mon.</div>
+          </div>
+          <div class="vstat">
+            <div class="vstat-val">${rl(f.en)!==null?(rl(f.en)<0?'✗':rl(f.en)+' Mo.'):'—'}</div>
+            <div class="vstat-lbl">Restlaufzeit</div>
+          </div>
+          <div class="vstat">
+            <div class="vstat-val">${f.ka?parseInt(f.ka).toLocaleString('de-DE')+'km':'—'}</div>
+            <div class="vstat-lbl">KM-Stand</div>
+          </div>
+        </div>
+
+        ${(f.fhr||f.bg||f.en||f.lg||f.lk)?`<div class="vcard-rows">
+          ${f.fhr?`<div class="vrow"><span class="vrow-lbl">Fahrer</span><span class="vrow-val">${f.fhr}</span></div>`:''}
+          ${f.bg||f.en?`<div class="vrow"><span class="vrow-lbl">Laufzeit</span><span class="vrow-val mono">${fD(f.bg)} – ${fD(f.en)}</span></div>`:''}
+          ${f.lg?`<div class="vrow"><span class="vrow-lbl">Leasingges.</span><span class="vrow-val">${f.lg}</span></div>`:''}
+          ${f.kt?`<div class="vrow"><span class="vrow-lbl">Konto</span><span class="vrow-val mono">${f.kt}</span></div>`:''}
+          ${f.kg?`<div class="vrow"><span class="vrow-lbl">KM Gesamt</span><span class="vrow-val">${fKM(f.kg)}</span></div>`:''}
+          ${f.lk?`<div class="vrow"><span class="vrow-lbl">Letzter Kontakt</span><span class="vrow-val">${fD(f.lk)}</span></div>`:''}
+          ${f.bm?`<div class="vrow"><span class="vrow-lbl">Bemerkung</span><span class="vrow-val" style="font-size:12px">${f.bm}</span></div>`:''}
+        </div>`:''}
+
+        <div class="vcard-actions">
+          <div class="va-btn" onclick="openFzM('${f.id}')">✏️ Bearbeiten</div>
+          <div class="va-btn" onclick="openNzM(null,'${f.kz}')">📋 Notiz</div>
+          <div class="va-btn va-btn-del" onclick="delFz('${f.id}')">🗑️</div>
+        </div>
+      </div>
+    </div>`).join('')
+  ||'<div class="empty"><div class="empty-ico">🚗</div><div class="empty-txt">Keine Fahrzeuge gefunden</div></div>';
+}
+
+// ── NOTIZEN ───────────────────────────────
+function renderNz(){
+  NZ=ld(KN);
+  const q=(document.getElementById('nq')?.value||'').toLowerCase();
+  const kf=document.getElementById('nkf')?.value||'';
+  const ef=document.getElementById('nef')?.value||'';
+  const list=NZ.filter(n=>
+    (!q||[n.ap,n.ih,n.td,n.kz,n.th].join(' ').toLowerCase().includes(q))&&
+    (!kf||n.kz===kf)&&(!ef||n.er===ef)
+  ).sort((a,b)=>(b.dt||'').localeCompare(a.dt||''));
+  const el=document.getElementById('nz-list');
+  el.innerHTML=list.map(n=>`
+    <div class="ncard">
+      <div class="ncard-top">
+        <span class="ncard-kz">${n.kz||'—'}</span>
+        <span class="ncard-date">${fD(n.dt)}</span>
+        ${n.th?`<span class="ncard-thema">${n.th}</span>`:''}
+      </div>
+      ${n.ap?`<div class="ncard-author">👤 ${n.ap}</div>`:''}
+      ${n.ih?`<div class="ncard-body">${n.ih}</div>`:''}
+      ${n.td?`<div class="ncard-todo"><b>📌 To-Do:</b> ${n.td}</div>`:''}
+      <div class="ncard-footer">
+        ${erlChip(n.er)}
+        <div class="nbts">
+          <div class="ibtn" onclick="openNzM('${n.id}')">✏️</div>
+          <div class="ibtn" onclick="delNz('${n.id}')">🗑️</div>
+        </div>
+      </div>
+    </div>`).join('')
+  ||'<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">Keine Notizen gefunden</div></div>';
+  updateBadge();
+}
+
+function fillKzDD(){
+  FZ=ld(KF);
+  const opts=FZ.map(f=>`<option value="${f.kz}">${f.kz} — ${f.typ}</option>`).join('');
+  ['nkf','n-kz'].forEach(id=>{
+    const s=document.getElementById(id);if(!s)return;
+    s.innerHTML=(id==='n-kz'?'<option value="">—</option>':'<option value="">Alle</option>')+opts;
+  });
+}
+
+// ── PHOTO ─────────────────────────────────
+async function handlePhotoChange(e){
+  const file=e.target.files[0];if(!file)return;
+  tmpPhoto=await photoToDataUrl(file);
+  const prev=document.getElementById('photo-preview');
+  let img=prev.querySelector('img');
+  if(!img){
+    img=document.createElement('img');
+    img.style.cssText='width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:inherit';
+    prev.appendChild(img);
+    prev.querySelector('span').style.display='none';
+    prev.querySelector('p').style.display='none';
+    prev.querySelector('.photo-hint').style.display='none';
+  }
+  img.src=tmpPhoto;
+}
+
+// ── MODALS ────────────────────────────────
+function openFzM(id){
+  eFz=id||null;tmpPhoto=null;
+  document.getElementById('mfz-t').textContent=id?'Bearbeiten':'Neues Fahrzeug';
+  const f=id?FZ.find(x=>x.id===id):null;
+  const mp={'f-typ':'typ','f-kz':'kz','f-fhr':'fhr','f-st':'st','f-bg':'bg','f-en':'en',
+            'f-kg':'kg','f-ka':'ka','f-rt':'rt','f-vn':'vn','f-lg':'lg','f-kt':'kt','f-lk':'lk','f-bm':'bm'};
+  Object.entries(mp).forEach(([el,k])=>{const e=document.getElementById(el);if(e)e.value=f?(f[k]||''):'';});
+  // reset photo preview
+  const prev=document.getElementById('photo-preview');
+  let img=prev.querySelector('img');
+  if(f?.photo){
+    if(!img){img=document.createElement('img');img.style.cssText='width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:inherit';prev.appendChild(img);}
+    img.src=f.photo;
+    prev.querySelectorAll('span,p,.photo-hint').forEach(e=>e.style.display='none');
+  }else{
+    if(img)img.remove();
+    prev.querySelectorAll('span,p,.photo-hint').forEach(e=>e.style.display='');
+  }
+  document.getElementById('m-fz').classList.add('open');
+}
+function openNzM(id, prefillKz){
+  eNz=id||null;fillKzDD();
+  document.getElementById('mnz-t').textContent=id?'Bearbeiten':'Neue Notiz';
+  const n=id?NZ.find(x=>x.id===id):null;
+  document.getElementById('n-dt').value=n?(n.dt||today()):today();
+  document.getElementById('n-kz').value=n?(n.kz||prefillKz||''):(prefillKz||'');
+  document.getElementById('n-ap').value=n?(n.ap||''):'';
+  document.getElementById('n-th').value=n?(n.th||'Leasing'):'Leasing';
+  document.getElementById('n-ih').value=n?(n.ih||''):'';
+  document.getElementById('n-td').value=n?(n.td||''):'';
+  document.getElementById('n-er').value=n?(n.er||'Nein'):'Nein';
+  document.getElementById('m-nz').classList.add('open');
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ── SAVE ──────────────────────────────────
+function saveFz(){
+  const typ=document.getElementById('f-typ').value.trim();
+  const kz=document.getElementById('f-kz').value.trim();
+  if(!typ||!kz){toast('Fahrzeugtyp und Kennzeichen erforderlich','err');return;}
+  FZ=ld(KF);
+  const old=eFz?FZ.find(f=>f.id===eFz):null;
+  const obj={
+    id:eFz||uid(),typ,kz,
+    fhr:document.getElementById('f-fhr').value.trim(),
+    st:document.getElementById('f-st').value,
+    bg:document.getElementById('f-bg').value,
+    en:document.getElementById('f-en').value,
+    kg:document.getElementById('f-kg').value,
+    ka:document.getElementById('f-ka').value,
+    rt:document.getElementById('f-rt').value,
+    vn:document.getElementById('f-vn').value.trim(),
+    lg:document.getElementById('f-lg').value.trim(),
+    kt:document.getElementById('f-kt').value.trim(),
+    lk:document.getElementById('f-lk').value,
+    bm:document.getElementById('f-bm').value.trim(),
+    photo:tmpPhoto!==null?tmpPhoto:(old?.photo||''),
+  };
+  if(eFz){const i=FZ.findIndex(f=>f.id===eFz);FZ[i]=obj;}else FZ.push(obj);
+  sv(KF,FZ);closeModal('m-fz');renderFz();
+  toast(eFz?'Fahrzeug aktualisiert':'Fahrzeug hinzugefügt');
+}
+function saveNz(){
+  const dt=document.getElementById('n-dt').value;
+  if(!dt){toast('Datum erforderlich','err');return;}
+  const obj={
+    id:eNz||uid(),dt,
+    kz:document.getElementById('n-kz').value,
+    ap:document.getElementById('n-ap').value.trim(),
+    th:document.getElementById('n-th').value,
+    ih:document.getElementById('n-ih').value.trim(),
+    td:document.getElementById('n-td').value.trim(),
+    er:document.getElementById('n-er').value,
+  };
+  NZ=ld(KN);
+  if(eNz){const i=NZ.findIndex(n=>n.id===eNz);NZ[i]=obj;}else NZ.push(obj);
+  sv(KN,NZ);closeModal('m-nz');renderNz();
+  toast(eNz?'Notiz aktualisiert':'Notiz gespeichert');
+}
+function delFz(id){if(!confirm('Fahrzeug löschen?'))return;sv(KF,ld(KF).filter(f=>f.id!==id));FZ=ld(KF);renderFz();toast('Gelöscht');}
+function delNz(id){if(!confirm('Notiz löschen?'))return;sv(KN,ld(KN).filter(n=>n.id!==id));NZ=ld(KN);renderNz();toast('Gelöscht');}
+
+// ── EXPORT ────────────────────────────────
+function exportCSV(t){
+  let rows,fn;
+  if(t==='fz'){
+    rows=[['Typ','KZ','Fahrer','Status','Beginn','Ende','KM-Ges','KM-Akt','Rate EUR','Vertragsnr','Leasingges','Konto','Letzter Kontakt','Bemerkung']];
+    ld(KF).forEach(f=>rows.push([f.typ,f.kz,f.fhr,f.st,fD(f.bg),fD(f.en),f.kg,f.ka,f.rt,f.vn,f.lg,f.kt,fD(f.lk),f.bm]));fn='Leasingfahrzeuge.csv';
+  }else{
+    rows=[['Datum','KZ','Ansprechpartner','Thema','Inhalt','ToDo','Erledigt']];
+    ld(KN).forEach(n=>rows.push([fD(n.dt),n.kz,n.ap,n.th,n.ih,n.td,n.er]));fn='Notizen.csv';
+  }
+  dl('\uFEFF'+rows.map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(';')).join('\r\n'),fn,'text/csv');
+  toast('Export erstellt ✓');
+}
+function exportJSON(){
+  const d={fahrzeuge:ld(KF),notizen:ld(KN),ts:new Date().toISOString()};
+  dl(JSON.stringify(d,null,2),'Flotte_Backup.json','application/json');toast('Backup erstellt ✓');
+}
+function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(!confirm(`Wiederherstellen?\n${d.fahrzeuge?.length||0} Fahrzeuge, ${d.notizen?.length||0} Notizen`))return;
+      if(d.fahrzeuge)sv(KF,d.fahrzeuge);
+      if(d.notizen)sv(KN,d.notizen);
+      FZ=ld(KF);NZ=ld(KN);toast('Backup wiederhergestellt ✓');
+    }catch{toast('Ungültige Datei','err');}
+  };
+  r.readAsText(file);e.target.value='';
+}
+function dl(c,n,m){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:m}));a.download=n;a.click();}
+
+// ── TOAST ─────────────────────────────────
+function toast(msg,type='ok'){
+  const el=document.createElement('div');
+  el.className=`toast t-${type}`;
+  el.appendChild(document.createTextNode(msg));
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .25s';},2600);
+  setTimeout(()=>el.remove(),2900);
+}
+
+// ── BACKDROP CLOSE ────────────────────────
+document.querySelectorAll('.overlay').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)b.classList.remove('open');}));
+
+// ── INSTALL ───────────────────────────────
+function checkInstall(){
+  const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const sa=window.navigator.standalone||window.matchMedia('(display-mode:standalone)').matches;
+  document.getElementById('install-bar')?.classList.toggle('show',iOS&&!sa);
+}
+
+// ── SERVICE WORKER ────────────────────────
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+
+// ── HASH ROUTING ──────────────────────────
+const chHash=()=>{const h=location.hash.slice(1);if(['fahrzeuge','notizen','export'].includes(h))goTab(h);};
+window.addEventListener('hashchange',chHash);
+
+renderDash();chHash();
+</script>
+</body>
+</html>
